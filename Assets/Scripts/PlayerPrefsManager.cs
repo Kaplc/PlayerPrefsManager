@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,6 +11,14 @@ public class PlayerPrefsManager
     {
         
     }
-    
-    
+
+    public void Save(object data, string key)
+    {
+        
+    }
+
+    public object Load(Type type, string key)
+    {
+        return null;
+    }
 }
