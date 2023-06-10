@@ -18,23 +18,42 @@ public class PlayerPrefsManager
     /// <param name="saveKey">键</param>
     /// <param name="value">保存的值</param>
     /// <param name="type">类型</param>
-    private void SaveValue(string saveKey, object value, Type type)
+    private void SaveValue(string saveKey, object fieldValue)
     {
-        if (type == typeof(int))
+        Type fieldType = fieldValue.GetType();
+        
+        if (fieldType == typeof(int))
         {
-            PlayerPrefs.SetInt(saveKey, (int)value);
+            Debug.Log($"保存{saveKey}");
+            PlayerPrefs.SetInt(saveKey, (int)fieldValue);
         }
-        if (type == typeof(float))
+        if (fieldType == typeof(float))
         {
-            PlayerPrefs.SetFloat(saveKey, (float)value);
+            Debug.Log($"保存{saveKey}");
+            PlayerPrefs.SetFloat(saveKey, (float)fieldValue);
         }
-        if (type == typeof(string))
+        if (fieldType == typeof(string))
         {
-            PlayerPrefs.SetString(saveKey, value.ToString());
+            Debug.Log($"保存{saveKey}");
+            PlayerPrefs.SetString(saveKey, fieldValue.ToString());
         }
-        if (type == typeof(bool))
+        if (fieldType == typeof(bool))
         {
-            PlayerPrefs.SetInt(saveKey, (bool)value ? 1 : 0);
+            Debug.Log($"保存{saveKey}");
+            PlayerPrefs.SetInt(saveKey, (bool)fieldValue ? 1 : 0);
+        }
+        // 判断该fieldType是否是IList子类
+        if (typeof(IList).IsAssignableFrom(fieldType))
+        {
+            string listSaveKey = "";
+            // Debug.Log($"保存{saveKey}");
+            IList list = fieldValue as IList;
+            for (int i = 0; i < list.Count; i++)
+            {
+                listSaveKey = saveKey + i;
+                SaveValue(listSaveKey, list[i]);
+            }
+            
         }
     }
     
@@ -48,8 +67,8 @@ public class PlayerPrefsManager
         {
             // key_数据类型_字段类型_字段名
             saveKey = key + "_" + dataType.Name + "_" + infos[i].FieldType.Name + "_" + infos[i].Name;
-
-            SaveValue(saveKey, infos[i].GetValue(data), dataType);
+            // infos[i].GetValue(data)字段的值
+            SaveValue(saveKey, infos[i].GetValue(data));
         }
     }
 
