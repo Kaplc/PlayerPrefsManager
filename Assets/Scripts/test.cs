@@ -5,20 +5,16 @@ using UnityEngine;
 
 public class PlayerInfo
 {
-    public int age = 10;
-    public string name = "abc";
-    public float height = 170.5f;
-    public bool sex = true;
+    public int age;
+    public string name;
+    public float height;
+    public bool sex;
 
-    public List<int> list = new List<int>() { 1, 2, 3 };
+    public List<int> list;
 
-    public Dictionary<int, string> dict = new Dictionary<int, string>()
-    {
-        { 1, "123" },
-        { 2, "456" }
-    };
+    public Dictionary<int, string> dict;
 
-    public Item item = new Item(1, "装备");
+    public Item item;
 
     public PlayerInfo()
     {
@@ -43,6 +39,17 @@ public class test : MonoBehaviour
     void Start()
     {
         PlayerInfo p1 = new PlayerInfo();
+        p1.age = 10;
+        p1.name = "abc";
+        p1.height = 170.5f;
+        p1.sex = true;
+        p1.list = new List<int>() { 1, 2, 3 };
+        p1.dict = new Dictionary<int, string>()
+        {
+            { 1, "123" },
+            { 2, "456" }
+        };
+        p1.item = new Item(1, "装备");
         PlayerPrefsManager.Instance.Save(p1, "player1");
 
         PlayerInfo p2 = new PlayerInfo();

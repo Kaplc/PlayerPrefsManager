@@ -100,10 +100,8 @@ public class PlayerPrefsManager
         }
     }
 
-    private object LoadValue(string loadKey, object field)
+    private object LoadValue(string loadKey, Type fieldType)
     {
-        Type fieldType = field.GetType();
-        
         if (fieldType == typeof(int))
         {
             return PlayerPrefs.GetInt(loadKey);
@@ -125,12 +123,36 @@ public class PlayerPrefsManager
         }
         else if (typeof(IList).IsAssignableFrom(fieldType))
         {
-            
+            // 创建新List对象
+            IList list = Activator.CreateInstance(fieldType) as IList;
+            // 读取List数量
+            Debug.Log($"{loadKey}_Count");
+            int listCount = PlayerPrefs.GetInt(loadKey + "_Count");
+
+            for (int i = 0; i < listCount; i++)
+            {
+                // 获取泛型类型 fieldType.GetGenericArguments()
+                list.Add(LoadValue(loadKey + i, fieldType.GetGenericArguments()[0]));
+            }
+
+            return list;
         }
         else if (typeof(IDictionary).IsAssignableFrom(fieldType))
         {
-            
+            IDictionary dict = Activator.CreateInstance(fieldType) as IDictionary;
+            int dictCount = PlayerPrefs.GetInt(loadKey + "_Count");
+
+            for (int i = 0; i < dictCount; i++)
+            {
+                dict.Add(
+                    LoadValue(loadKey + "_key" + i, fieldType.GetGenericArguments()[0]),
+                    LoadValue(loadKey + "_value" + i, fieldType.GetGenericArguments()[1])
+                    );
+            }
+
+            return dict;
         }
+
         return null;
     }
 
@@ -145,7 +167,7 @@ public class PlayerPrefsManager
         for (int i = 0; i < infos.Length; i++)
         {
             loadKey = key + "_" + type.Name + "_" + infos[i].FieldType.Name + "_" + infos[i].Name;
-            infos[i].SetValue(obj, LoadValue(loadKey, infos[i].GetValue(obj)));
+            infos[i].SetValue(obj, LoadValue(loadKey, infos[i].FieldType));
         }
 
         return obj;
