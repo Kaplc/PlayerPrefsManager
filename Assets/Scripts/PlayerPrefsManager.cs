@@ -98,6 +98,7 @@ public class PlayerPrefsManager
             // infos[i].GetValue(data)字段的值
             SaveValue(saveKey, infos[i].GetValue(data));
         }
+        PlayerPrefs.Save();
     }
 
     private object LoadValue(string loadKey, Type fieldType)
@@ -152,7 +153,10 @@ public class PlayerPrefsManager
 
             return dict;
         }
-
+        else
+        {
+            return Load(fieldType, loadKey);
+        }
         return null;
     }
 
@@ -162,8 +166,8 @@ public class PlayerPrefsManager
         object obj = Activator.CreateInstance(type);
         // 获取新对象字段信息
         FieldInfo[] infos = type.GetFields();
-        FieldInfo info;
         string loadKey = "";
+        
         for (int i = 0; i < infos.Length; i++)
         {
             loadKey = key + "_" + type.Name + "_" + infos[i].FieldType.Name + "_" + infos[i].Name;
