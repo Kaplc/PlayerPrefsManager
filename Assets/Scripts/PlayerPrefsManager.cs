@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerPrefsManager
 {
@@ -82,9 +83,8 @@ public class PlayerPrefsManager
         {
             Save(fieldValue, saveKey);
         }
-        
     }
-    
+
     public void Save(object data, string key)
     {
         Type dataType = data.GetType();
@@ -100,8 +100,54 @@ public class PlayerPrefsManager
         }
     }
 
+    private object LoadValue(string loadKey, object field)
+    {
+        Type fieldType = field.GetType();
+        
+        if (fieldType == typeof(int))
+        {
+            return PlayerPrefs.GetInt(loadKey);
+        }
+
+        else if (fieldType == typeof(float))
+        {
+            return PlayerPrefs.GetFloat(loadKey);
+        }
+
+        else if (fieldType == typeof(string))
+        {
+            return PlayerPrefs.GetString(loadKey);
+        }
+
+        else if (fieldType == typeof(bool))
+        {
+            return PlayerPrefs.GetInt(loadKey) == 1;
+        }
+        else if (typeof(IList).IsAssignableFrom(fieldType))
+        {
+            
+        }
+        else if (typeof(IDictionary).IsAssignableFrom(fieldType))
+        {
+            
+        }
+        return null;
+    }
+
     public object Load(Type type, string key)
     {
-        return null;
+        // 通过type创建对象
+        object obj = Activator.CreateInstance(type);
+        // 获取新对象字段信息
+        FieldInfo[] infos = type.GetFields();
+        FieldInfo info;
+        string loadKey = "";
+        for (int i = 0; i < infos.Length; i++)
+        {
+            loadKey = key + "_" + type.Name + "_" + infos[i].FieldType.Name + "_" + infos[i].Name;
+            infos[i].SetValue(obj, LoadValue(loadKey, infos[i].GetValue(obj)));
+        }
+
+        return obj;
     }
 }
