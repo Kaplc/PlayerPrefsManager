@@ -12,8 +12,28 @@ public class PlayerInfo
 
     public List<int> list = new List<int>() { 1, 2, 3 };
 
+    public Dictionary<int, string> dict = new Dictionary<int, string>()
+    {
+        { 1, "123" },
+        { 2, "456" }
+    };
+
+    public Item item = new Item(1, "装备");
+
     public PlayerInfo()
     {
+    }
+}
+
+public class Item
+{
+    public int id;
+    public string name;
+
+    public Item(int id, string name)
+    {
+        this.id = id;
+        this.name = name;
     }
 }
 

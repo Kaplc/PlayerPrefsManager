@@ -11,7 +11,7 @@ public class PlayerPrefsManager
     public PlayerPrefsManager()
     {
     }
-    
+
     /// <summary>
     /// 调用PlayerPrefs保存各种类型的数据
     /// </summary>
@@ -21,40 +21,68 @@ public class PlayerPrefsManager
     private void SaveValue(string saveKey, object fieldValue)
     {
         Type fieldType = fieldValue.GetType();
-        
+
         if (fieldType == typeof(int))
         {
             Debug.Log($"保存{saveKey}");
             PlayerPrefs.SetInt(saveKey, (int)fieldValue);
         }
-        if (fieldType == typeof(float))
+
+        else if (fieldType == typeof(float))
         {
             Debug.Log($"保存{saveKey}");
             PlayerPrefs.SetFloat(saveKey, (float)fieldValue);
         }
-        if (fieldType == typeof(string))
+
+        else if (fieldType == typeof(string))
         {
             Debug.Log($"保存{saveKey}");
             PlayerPrefs.SetString(saveKey, fieldValue.ToString());
         }
-        if (fieldType == typeof(bool))
+
+        else if (fieldType == typeof(bool))
         {
             Debug.Log($"保存{saveKey}");
             PlayerPrefs.SetInt(saveKey, (bool)fieldValue ? 1 : 0);
         }
+
         // 判断该fieldType是否是IList子类
-        if (typeof(IList).IsAssignableFrom(fieldType))
+        else if (typeof(IList).IsAssignableFrom(fieldType))
         {
-            string listSaveKey = "";
-            // Debug.Log($"保存{saveKey}");
             IList list = fieldValue as IList;
+            // 储存数量
+            Debug.Log($"{saveKey}_Count");
+            PlayerPrefs.SetInt(saveKey + "_Count", list.Count);
+
             for (int i = 0; i < list.Count; i++)
             {
-                listSaveKey = saveKey + i;
-                SaveValue(listSaveKey, list[i]);
+                SaveValue(saveKey + i, list[i]);
             }
-            
         }
+
+        else if (typeof(IDictionary).IsAssignableFrom(fieldType))
+        {
+            IDictionary dict = fieldValue as IDictionary;
+
+            Debug.Log($"{saveKey}_Count");
+            PlayerPrefs.SetInt(saveKey + "_Count", dict.Count);
+
+            int index = 0;
+            foreach (object key in dict.Keys)
+            {
+                // 保存key
+                SaveValue(saveKey + "_key" + index, key);
+                // 保存value
+                SaveValue(saveKey + "_value" + index, dict[key]);
+                index++;
+            }
+        }
+        // 自定义数据类型继续调用保存方法
+        else
+        {
+            Save(fieldValue, saveKey);
+        }
+        
     }
     
     public void Save(object data, string key)
